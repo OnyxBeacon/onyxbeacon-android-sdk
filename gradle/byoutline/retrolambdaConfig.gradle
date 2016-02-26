@@ -1,0 +1,36 @@
+apply plugin: RetrolambdaDeps
+
+retrolambda {
+    def jdkHome = 'JAVA8_HOME'
+    def oldJdkHome = 'JAVA7_HOME'
+    if (System.getenv(jdkHome) == null || System.getenv(oldJdkHome) == null) {
+        logger.warn("$jdkHome or $oldJdkHome enviromental variable not found. " +
+                'Please set them. Retrolambda may fail without them.')
+    } else {
+        jdk System.getenv(jdkHome)
+        oldJdk System.getenv(oldJdkHome)
+        javaVersion JavaVersion.VERSION_1_7
+    }
+}
+
+public final class RetrolambdaDeps implements Plugin<Project>{
+
+    @Override
+    void apply(Project project) {
+        addDependencies(project)
+        applyPlugins(project)
+    }
+
+    private void addDependencies(Project project) {
+        project.afterEvaluate {
+            def pd = project.dependencies
+            pd.add('retrolambdaConfig', 'net.orfjackal.retrolambda:retrolambda:2.1.0')
+        }
+    }
+
+    private void applyPlugins(Project project) {
+        project.configure(project) {
+            apply plugin: 'me.tatarka.retrolambda'
+        }
+    }
+}
